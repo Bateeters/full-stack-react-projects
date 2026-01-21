@@ -14,7 +14,13 @@ const post = new Post({
 })
 
 // Call .save() on the post to save it to the database
-await post.save()
+// We are also saving this post to a constant for later use
+const createdPost = await post.save()
+
+// Using the constant to find the post by id and update the title
+await Post.findByIdAndUpdate(createdPost._id, {
+  $set: { title: 'Hello again, Mongoose!' },
+})
 
 // Use .find() to list all posts, and log result
 const posts = await Post.find()
