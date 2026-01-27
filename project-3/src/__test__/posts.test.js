@@ -75,7 +75,7 @@ const samplePosts = [
   { title: 'Learn React Hooks', author: 'Brian Teeters', tags: ['react'] },
   {
     title: 'Full-Stack React Projects',
-    author: 'Mr. Full-Stack',
+    author: 'Brian Teeters',
     tags: ['react', 'nodejs'],
   },
   { title: 'Guide to TypeScript' },
@@ -159,7 +159,7 @@ describe('listing posts', () => {
 
   test('should be able to filter posts by author', async () => {
     const posts = await listPostsByAuthor('Brian Teeters')
-    expect(posts.length).toBe(1)
+    expect(posts.length).toBe(2)
   })
 })
 
