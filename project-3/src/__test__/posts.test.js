@@ -1,6 +1,11 @@
 import mongoose from 'mongoose'
-import { describe, expect, test } from '@jest/globals'
-import { createPost } from '../services/posts.js'
+import { describe, expect, test, beforeEach } from '@jest/globals'
+import {
+  createPost,
+  listAllPosts,
+  listPostsByAuthor,
+  listPostsByTag,
+} from '../services/posts.js'
 import { Post } from '../db/models/post.js'
 
 // Let's use describe() to define a new test
@@ -61,6 +66,100 @@ describe('creating posts', () => {
 
     const createdPost = await createPost(post)
     expect(createdPost._id).toBeInstanceOf(mongoose.Types.ObjectId)
+  })
+})
+
+// This will be our posts used in the tests
+const samplePosts = [
+  { title: 'Learning Redux', author: 'Daniel Bugl', tags: ['redux'] },
+  { title: 'Learn React Hooks', author: 'Brian Teeters', tags: ['react'] },
+  {
+    title: 'Full-Stack React Projects',
+    author: 'Mr. Full-Stack',
+    tags: ['react', 'nodejs'],
+  },
+  { title: 'Guide to TypeScript' },
+]
+
+// This will be where we populate our posts
+let createdSamplePosts = []
+
+// This function clears all posts including the database and the array of sample posts
+// It then creates the sample posts in the database again for each post defined.
+// This reset / repopulation ensures that we always have a consistent state of the database before each test
+// It also makes sure we have an array to compare against when testing the list funcitons.
+beforeEach(async () => {
+  // Delete all posts in Post
+  await Post.deleteMany({})
+  // Makes sure createdSamplePosts is empty
+  createdSamplePosts = []
+  // For each post in samplePosts (the defined tests posts)...
+  for (const post of samplePosts) {
+    // ... create a new post object...
+    const createdPost = new Post(post)
+    // ... and push it to the empty createdSamplePosts array.
+    createdSamplePosts.push(await createdPost.save())
+  }
+})
+
+// Create a new testing group for listing the posts
+describe('listing posts', () => {
+  // Test that all posts return
+  test('should return all posts', async () => {
+    // Run the listAllPosts function
+    const posts = await listAllPosts()
+
+    // Compare the length of each array
+    expect(posts.length).toEqual(createdSamplePosts.length)
+  })
+
+  // Test that posts are sorted by descending createdAt values
+  test('should return posts sorted by creation date descending by default', async () => {
+    // Run the listAllPosts function as it has default parameters set to sort
+    const posts = await listAllPosts()
+
+    // Manually sort the createdSamplePosts array
+    const sortedSamplePosts = createdSamplePosts.sort(
+      (a, b) => b.createdAt - a.createdAt,
+    )
+
+    // Compare the manually sorted dates to those returned by listAllPosts()
+    expect(posts.map((post) => post.createdAt)).toEqual(
+      sortedSamplePosts.map((post) => post.createdAt),
+    )
+  })
+
+  // Test that listAllPosts can take arguments on sortBy and sortOrder
+  test('should take into account provided sorting options', async () => {
+    // Pass parameters for sortBy and sortOrder to make sure it's not using defaults
+    const posts = await listAllPosts({
+      sortBy: 'updatedAt',
+      sortOrder: 'ascending',
+    })
+
+    // Manually sort createdSamplePosts array by updatedAt
+    const sortedSamplePosts = createdSamplePosts.sort(
+      // change order to ascending instead of descending
+      (a, b) => a.updatedAt - b.updatedAt,
+    )
+    // Compare the manually sorted to what's returned by listAllPosts()
+    expect(posts.map((post) => post.updatedAt)).toEqual(
+      sortedSamplePosts.map((post) => post.updatedAt),
+    )
+  })
+
+  // Test that listPostsByTag filters and returns only posts with a specified tag
+  test('should be able to filter posts by tag', async () => {
+    // Pass the 'nodejs' tag for filtering
+    const posts = await listPostsByTag('nodejs')
+
+    // Check that there is only 1 post returned
+    expect(posts.length).toBe(1)
+  })
+
+  test('should be able to filter posts by author', async () => {
+    const posts = await listPostsByAuthor('Brian Teeters')
+    expect(posts.length).toBe(1)
   })
 })
 

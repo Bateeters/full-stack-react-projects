@@ -16,7 +16,7 @@ async function listPosts(
   { sortBy = 'createdAt', sortOrder = 'descending' } = {},
 ) {
   // We then use .find() from our Mongoose model to list all posts, passing an argument to sort them
-  return await Post.find(query).toSorted({ [sortBy]: sortOrder })
+  return await Post.find(query).sort({ [sortBy]: sortOrder })
 }
 
 // Now with listPost() defined, let's define listAllPost()
