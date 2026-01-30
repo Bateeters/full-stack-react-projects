@@ -34,3 +34,28 @@ export async function listPostsByAuthor(author, options) {
 export async function listPostsByTag(tags, options) {
   return await listPosts({ tags }, options)
 }
+
+// defining getPostById()
+export async function getPostById(postId) {
+  return await Post.findById(postId)
+}
+
+// defining updatePost()
+// the function takes an ID of an existing post, and an object of parameters to be updated
+export async function updatePost(postId, { title, author, contents, tags }) {
+  return await Post.findOneAndUpdate(
+    // we find the post with the ID
+    { _id: postId },
+
+    // we specify which parameters to change with $set
+    { $set: { title, author, contents, tags } },
+
+    // we make sure the function returns the modified object instead of the original
+    { new: true },
+  )
+}
+
+// defining deletePost()
+export async function deletePost(postId) {
+  return await Post.deleteOne({ _id: postId })
+}
