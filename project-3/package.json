@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "lint": "eslint src",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "start": "node src/index.js"
   },
   "dependencies": {
     "mongodb": "^7.0.0",
