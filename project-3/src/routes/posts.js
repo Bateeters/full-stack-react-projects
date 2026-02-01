@@ -4,6 +4,9 @@ import {
   listPostsByAuthor,
   listPostsByTag,
   getPostById,
+  createPost,
+  updatePost,
+  deletePost,
 } from '../services/posts.js'
 
 // Create and export a new function that takes the Express app as an argument
@@ -45,7 +48,7 @@ export function postsRoutes(app) {
   })
 
   // Define API route to get a single post using the :id param placeholder, making it a dynamic parameter in the funciton
-  app.get('./api/v1/posts/:id', async (req, res) => {
+  app.get('/api/v1/posts/:id', async (req, res) => {
     // access req.params.id to get the :id part of the route and pass it to the service function
     const { id } = req.params
     try {
@@ -58,6 +61,47 @@ export function postsRoutes(app) {
       return res.json(post)
     } catch (err) {
       console.error('error getting post', err)
+      return res.status(500).end()
+    }
+  })
+
+  // Define API route to POST a new post
+  app.post('/api/v1/posts', async (req, res) => {
+    try {
+      // Create a new post and return the JSON object
+      const post = await createPost(req.body)
+      return res.json(post)
+
+      // Catch any errors and return a 500 status
+    } catch (err) {
+      console.error('error creating post', err)
+      return res.status(500).end()
+    }
+  })
+
+  // Define API route to update (PATCH) post using the id param and req.body
+  app.patch('/api/v1/posts/:id', async (req, res) => {
+    try {
+      const post = await updatePost(req.params.id, req.body)
+      return res.json(post)
+    } catch (err) {
+      console.error('error updating post', err)
+      return res.status(500).end()
+    }
+  })
+
+  // Define API route to DELETE post using the id param
+  app.delete('/api/v1/posts/:id', async (req, res) => {
+    try {
+      const { deletedCount } = await deletePost(req.params.id)
+
+      // We return 404 if no post was found
+      if (deletedCount === 0) return res.sendStatus(404)
+
+      // and 204 No Content, if the post was successfully deleted
+      return res.status(204).end()
+    } catch (err) {
+      console.error('error deleting post', err)
       return res.status(500).end()
     }
   })
