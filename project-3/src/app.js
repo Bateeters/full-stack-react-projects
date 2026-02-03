@@ -1,5 +1,6 @@
 import express from 'express'
 import bodyParser from 'body-parser'
+import cors from 'cors'
 
 // Import the API routing funciton
 import { postsRoutes } from './routes/posts.js'
@@ -7,7 +8,8 @@ import { postsRoutes } from './routes/posts.js'
 // Initializing new Express app (make sure this is first after imports)
 const app = express()
 
-// add body-parser plugin as middleware
+// add plugins as middleware
+app.use(cors())
 app.use(bodyParser.json())
 
 // Make sure we call this AFTER initializing the app
