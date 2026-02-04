@@ -8,7 +8,6 @@ export function Post({ title, contents, author }) {
       <div>{contents}</div>
       {author && (
         <em>
-          <br />
           Written by <strong>{author}</strong>
         </em>
       )}
