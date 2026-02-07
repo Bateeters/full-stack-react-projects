@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { createPost } from '../api/posts.js'
 
@@ -8,9 +8,13 @@ export function CreatePost() {
   const [author, setAuthor] = useState('')
   const [contents, setContents] = useState('')
 
+  const queryClient = useQueryClient()
+
   // Define a mutation hook, calling the createPost function
   const createPostMutation = useMutation({
     mutationFn: () => createPost({ title, author, contents }),
+    // on successful mutations, invalidate all queries with the 'post' query key
+    onSuccess: () => queryClient.invalidateQueries(['posts']),
   })
 
   // Define a handleSubmit function to prevent default (page refresh) and execute the mutation using .mutate()
