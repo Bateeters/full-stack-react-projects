@@ -1,8 +1,6 @@
 // Import all our service functions
 import {
-  listAllPosts,
-  listPostsByAuthor,
-  listPostsByTag,
+  listPosts,
   getPostById,
   createPost,
   updatePost,
@@ -25,20 +23,24 @@ export function postsRoutes(app) {
 
     // Create a try/catch incase invalid data is entered, this handles potential errors
     try {
-      // Check if author OR tag was provided, throw 400 error if both
-      if (author && tag) {
-        return res
-          .status(400)
-          .json({ error: 'query by either author or tag, not both' })
+      const query = {}
+
+      if (author && author.trim()) {
+        query.author = {
+          $regex: author.trim(),
+          $options: 'i',
+        }
       }
-      // Otherwise, call respective service function and return JSON respose with res.json()
-      else if (author) {
-        return res.json(await listPostsByAuthor(author, options))
-      } else if (tag) {
-        return res.json(await listPostsByTag(tag, options))
-      } else {
-        return res.json(await listAllPosts(options))
+
+      if (tag && tag.trim()) {
+        query.tags = {
+          $regex: tag.trim(),
+          $options: 'i',
+        }
       }
+
+      // Use listPosts with the combine query
+      return res.json(await listPosts(query, options))
 
       // If an error happens, we catch it, log it, and return a 500 status
     } catch (err) {

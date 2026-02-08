@@ -19,18 +19,10 @@ export async function createPost({ title, author, contents, tags }) {
 }
 
 // Define listPosts() for sorting and listing of posts
-async function listPosts(
-  // this function accepts a query and options argument
-  // leaving query empty defaults to showing ALL posts
-  query = {},
-  // we then define the default to be sorted by createdAt timestamp and to list them in a descending order
-  { sortBy = 'createdAt', sortOrder = 'descending' } = {},
-) {
-  // find if sortOrder is descending or ascending
-  // mongo uses -1 for descending and 1 for ascending
+export async function listPosts(query = {}, options = {}) {
+  const { sortBy = 'createdAt', sortOrder = 'descending' } = options
   const mongoSortOrder = sortOrder === 'descending' ? -1 : 1
 
-  // We then use .find() from our Mongoose model to list all posts, passing an argument to sort them
   return await Post.find(query).sort({
     [sortBy]: mongoSortOrder,
   })
