@@ -61,7 +61,19 @@ export async function listPostsByAuthor(author, options) {
 
 // defining listPostsByTag()
 export async function listPostsByTag(tag, options) {
-  return await listPosts({ tags: tag.toLowerCase() }, options)
+  if (!tag || !tag.trim()) {
+    return await listAllPosts(options)
+  }
+
+  return await listPosts(
+    {
+      tags: {
+        $regex: tag.trim(),
+        $options: 'i',
+      },
+    },
+    options,
+  )
 }
 
 // defining getPostById()

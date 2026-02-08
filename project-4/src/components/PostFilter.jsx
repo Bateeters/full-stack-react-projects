@@ -19,4 +19,5 @@ PostFilter.propTypes = {
   field: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
   onChange: PropTypes.string.isRequired,
+  tags: PropTypes.string.isRequired,
 }
