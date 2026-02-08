@@ -7,12 +7,20 @@ export function CreatePost() {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [contents, setContents] = useState('')
+  const [tags, setTags] = useState('')
 
   const queryClient = useQueryClient()
 
   // Define a mutation hook, calling the createPost function
   const createPostMutation = useMutation({
-    mutationFn: () => createPost({ title, author, contents }),
+    mutationFn: () => {
+      const tagsArray = tags
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter(Boolean)
+
+      return createPost({ title, author, contents, tags: tagsArray })
+    },
     // on successful mutations, invalidate all queries with the 'post' query key
     onSuccess: () => queryClient.invalidateQueries(['posts']),
   })
@@ -21,6 +29,10 @@ export function CreatePost() {
   const handleSubmit = (e) => {
     e.preventDefault()
     createPostMutation.mutate()
+    setTitle('')
+    setAuthor('')
+    setTags('')
+    setContents('')
   }
 
   return (
@@ -43,6 +55,16 @@ export function CreatePost() {
           id='create-author'
           value={author}
           onChange={(e) => setAuthor(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor='create-tags'>Tags (separate by commas): </label>
+        <textarea
+          type='text'
+          name='create-tags'
+          id='create-tags'
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
         />
       </div>
       <textarea

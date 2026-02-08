@@ -1,14 +1,35 @@
 import PropTypes from 'prop-types'
 
 // Post component that accepts a title, contents, and author
-export function Post({ title, contents, author }) {
+export function Post({ title, contents, author, updatedAt, tags }) {
+  const isoDateString = updatedAt
+  const dateObject = new Date(isoDateString)
+
+  const formattedUpdate = dateObject.toLocaleDateString('en-US')
+
   return (
     <article>
       <h3>{title}</h3>
       <div>{contents}</div>
+      <div style={{ display: 'flex' }}>
+        {tags.map((tag) => (
+          <h5
+            style={{
+              padding: '6px 12px',
+              border: '1px solid #dddddd',
+              marginRight: '15px',
+              borderRadius: '7px',
+              backgroundColor: 'whitesmoke',
+            }}
+            key={tag}
+          >
+            {tag}
+          </h5>
+        ))}
+      </div>
       {author && (
         <em>
-          Written by <strong>{author}</strong>
+          Written by <strong>{author}</strong> - Last Updated: {formattedUpdate}
         </em>
       )}
     </article>

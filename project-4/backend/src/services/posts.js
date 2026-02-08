@@ -2,8 +2,19 @@ import { Post } from '../db/models/post.js'
 
 // Define createPost() for post creation
 export async function createPost({ title, author, contents, tags }) {
+  // Ensure tags is an array
+  const normalizedTags = Array.isArray(tags)
+    ? tags.map((tag) => tag.trim().toLowerCase()).filter(Boolean)
+    : []
+
   // We list all the properties we want the user to provide in order to have control over which properties the user can set
-  const post = new Post({ title, author, contents, tags })
+  const post = new Post({
+    title,
+    author,
+    contents,
+    tags: normalizedTags,
+  })
+
   return await post.save()
 }
 
@@ -15,8 +26,14 @@ async function listPosts(
   // we then define the default to be sorted by createdAt timestamp and to list them in a descending order
   { sortBy = 'createdAt', sortOrder = 'descending' } = {},
 ) {
+  // find if sortOrder is descending or ascending
+  // mongo uses -1 for descending and 1 for ascending
+  const mongoSortOrder = sortOrder === 'descending' ? -1 : 1
+
   // We then use .find() from our Mongoose model to list all posts, passing an argument to sort them
-  return await Post.find(query).sort({ [sortBy]: sortOrder })
+  return await Post.find(query).sort({
+    [sortBy]: mongoSortOrder,
+  })
 }
 
 // Now with listPost() defined, let's define listAllPost()
@@ -27,12 +44,24 @@ export async function listAllPosts(options) {
 
 // defining listPostsByAuthor()
 export async function listPostsByAuthor(author, options) {
-  return await listPosts({ author }, options)
+  if (!author || !author.trim()) {
+    return await listAllPosts(options)
+  }
+
+  return await listPosts(
+    {
+      author: {
+        $regex: author.trim(),
+        $options: 'i',
+      },
+    },
+    options,
+  )
 }
 
 // defining listPostsByTag()
-export async function listPostsByTag(tags, options) {
-  return await listPosts({ tags }, options)
+export async function listPostsByTag(tag, options) {
+  return await listPosts({ tags: tag.toLowerCase() }, options)
 }
 
 // defining getPostById()

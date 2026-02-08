@@ -9,7 +9,10 @@ const postSchema = new Schema(
     author: String,
     contents: String,
     // We also have tags, which are a string array
-    tags: [String],
+    tags: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true },
 )

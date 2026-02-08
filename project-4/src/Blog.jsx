@@ -11,11 +11,12 @@ export function Blog() {
   const [author, setAuthor] = useState('')
   const [sortBy, setSortBy] = useState('createdAt')
   const [sortOrder, setSortOrder] = useState('descending')
+  const [tags, setTags] = useState('')
 
   const postsQuery = useQuery({
     // queryKey is extremely important for TanStack Query, it's used to uniquely identify a request
-    queryKey: ['posts', { author, sortBy, sortOrder }],
-    queryFn: () => getPosts({ author, sortBy, sortOrder }),
+    queryKey: ['posts', { author, sortBy, sortOrder, tags }],
+    queryFn: () => getPosts({ author, sortBy, sortOrder, tags }),
   })
 
   // get the posts from the query. fall back to an empty array if no posts are loaded yet
@@ -30,6 +31,11 @@ export function Blog() {
         field='author'
         value={author}
         onChange={(value) => setAuthor(value)}
+      />
+      <PostFilter
+        field='tags'
+        value={tags}
+        onChange={(value) => setTags(value)}
       />
       <PostSorting
         fields={['createdAt', 'updatedAt']}
