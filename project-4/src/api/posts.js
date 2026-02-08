@@ -18,3 +18,8 @@ export const createPost = async (post) => {
   // We also need to parse the response as JSON
   return await res.json()
 }
+
+export const getPostById = async (id) => {
+  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/posts/${id}`)
+  return await res.json()
+}

@@ -1,14 +1,18 @@
 import PropTypes from 'prop-types'
+import { useNavigate } from 'react-router-dom'
 
 // Post component that accepts a title, contents, and author
-export function Post({ title, contents, author, updatedAt, tags }) {
+export function Post({ title, contents, author, updatedAt, tags, _id }) {
   const isoDateString = updatedAt
   const dateObject = new Date(isoDateString)
 
   const formattedUpdate = dateObject.toLocaleDateString('en-US')
 
+  const navigate = useNavigate()
+
   return (
     <article>
+      <span>{_id}</span>
       <h3>{title}</h3>
       <div>{contents}</div>
       <div style={{ display: 'flex' }}>
@@ -32,6 +36,8 @@ export function Post({ title, contents, author, updatedAt, tags }) {
           Written by <strong>{author}</strong> - Last Updated: {formattedUpdate}
         </em>
       )}
+      <button onClick={() => navigate(`/blog/${_id}`)}>View More</button>
+      <button onClick={() => navigate(`/blog/${_id}/edit`)}>Edit</button>
     </article>
   )
 }
